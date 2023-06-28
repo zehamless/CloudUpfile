@@ -1,5 +1,6 @@
 <%- include('layouts/header') %>
-<form action="/profile" method="post" enctype="multipart/form-data">
-    <input type="file" name="avatar" />
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="fileUpload" />
+    <input type="submit" value="Upload" />
   </form>
 <%- include('layouts/footer') %>
