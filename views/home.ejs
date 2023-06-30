@@ -3,8 +3,21 @@
     <input type="file" name="fileUpload" />
     <input type="submit" value="Upload" />
   </form>
-
+  
+  <div class="container">
+  <div class="row">
   <% files.forEach(element => { %>
-    <p>files: <%= element %></p>
-  <% }); %>
+      <div class="col">
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="<% element %>" alt="Card image cap">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="btn btn-primary"><%= element %></a>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+  </div>
 <%- include('layouts/footer') %>

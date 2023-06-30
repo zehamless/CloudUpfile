@@ -37,7 +37,7 @@ app.get(
         res.redirect("/files");
     }
 );
-app.post("/upload", upload.single("fileUpload"), (req, res) => {
+app.post("/upload", upload.single("fileUpload"), upload.fileHandler, (req, res) => {
     res.send("File uploaded successfully");
 });
 

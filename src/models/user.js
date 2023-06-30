@@ -8,6 +8,10 @@ const userSchema = new mongoose.Schema({
     username: String,
     password: String,
     googleId: String,
+    Files: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "File"
+    }]
 });
 
 userSchema.plugin(passportLocalMongoose);
