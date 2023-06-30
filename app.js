@@ -4,8 +4,7 @@ const app = express();
 const port = 3000;
 const passport = require("./src/configs/passportConfig");
 const upload = require("./src/controllers/fileUploadController");
-
-
+const getfiles = require("./src/controllers/fileManageController");
 
 app.set("view engine", "ejs");
 app.use(
@@ -35,12 +34,46 @@ app.get(
     passport.authenticate("google", { failureRedirect: "/login" }),
     function (req, res) {
         // Successful authentication, redirect home.
-        res.redirect("/home");
+        res.redirect("/files");
     }
 );
 app.post("/upload", upload.single("fileUpload"), (req, res) => {
     res.send("File uploaded successfully");
 });
+
+app.get("/files", (req, res) => {
+    if (req.isAuthenticated()) {
+        try {
+            const user = req.user.id;
+            console.log(user);
+            getfiles.getFiles(user)
+            .then(files => {
+            //   console.log(files);
+            res.render("home", { files: files });
+            })
+            .catch(err => {
+              console.error("Error retrieving files:", err);
+            });
+        } catch (error) {
+            console.log("Error retrieving user:", error);
+            res.status(500).send("Internal Server Error");
+        }
+    }
+    else {
+        console.log("Not logged in");
+        res.redirect("/login"); // Redirect to login page or handle as desired
+    }
+});
+
+// app.get("/secrets", (req, res) =>{
+//     User.find({"secret": {$ne: null}}).then(function(foundUsers){
+//       if(foundUsers){
+//         res.render("secrets", {secret: foundUsers});
+//       }
+//     }).catch(err =>{
+//       console.log(err);
+//     });
+//   });
 
 // app.get("/profile", async (req, res) => {
 //     if (req.isAuthenticated()) {

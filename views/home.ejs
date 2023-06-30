@@ -3,4 +3,8 @@
     <input type="file" name="fileUpload" />
     <input type="submit" value="Upload" />
   </form>
+
+  <% files.forEach(element => { %>
+    <p>files: <%= element %></p>
+  <% }); %>
 <%- include('layouts/footer') %>
