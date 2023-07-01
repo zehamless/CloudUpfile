@@ -1,29 +1,22 @@
 const fs = require('fs-extra');
 const path = require('path');
+const { User } = require('../models/user');
+const { File } = require('../models/file');
 
+async function getFiles(username) {
+  try {
 
-function getFiles(username) {
-    return new Promise((resolve, reject) => {
-      if (!username) {
-        reject(new Error("Invalid username"));
-        return;
+      const user = await User.findById(username).populate('Files');
+      if (!user) {
+        throw new Error('User not found');
       }
-  
-      const destinationFolder = path.join("uploads", username);
-  
-      fs.ensureDir(destinationFolder)
-        .then(() => {
-          fs.readdir(destinationFolder)
-            .then(files => {
-              resolve(files);
-            })
-            .catch(err => {
-              reject(err);
-            });
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+      const files = user.Files;
+      console.log('Files:', files);
+      return files;
+  } catch (err) {
+    console.error(err);
+    return null;
   }
-module.exports = {getFiles};
+}
+
+module.exports = { getFiles };

@@ -17,6 +17,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+const isAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+};
+
 //AUTHENTICATION
 app.get(
     "/auth/google",
@@ -37,32 +44,21 @@ app.get(
         res.redirect("/files");
     }
 );
-app.post("/upload", upload.single("fileUpload"), upload.fileHandler, (req, res) => {
+app.post("/upload", isAuthenticated, upload.single("fileUpload"), upload.fileHandler, (req, res) => {
     res.send("File uploaded successfully");
 });
 
-app.get("/files", (req, res) => {
-    if (req.isAuthenticated()) {
-        try {
-            const user = req.user.id;
-            console.log(user);
-            getfiles.getFiles(user)
-            .then(files => {
-            //   console.log(files);
+app.get("/files", isAuthenticated, (req, res) => {
+    getfiles.getFiles(req.user.id)
+        .then(files => {
             res.render("home", { files: files });
-            })
-            .catch(err => {
-              console.error("Error retrieving files:", err);
-            });
-        } catch (error) {
-            console.log("Error retrieving user:", error);
+            console.log(files);
+        })
+        .catch(err => {
+            console.log(err);
             res.status(500).send("Internal Server Error");
-        }
-    }
-    else {
-        console.log("Not logged in");
-        res.redirect("/login"); // Redirect to login page or handle as desired
-    }
+        });
+
 });
 
 // app.get("/secrets", (req, res) =>{

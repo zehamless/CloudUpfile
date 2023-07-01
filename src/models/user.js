@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     googleId: String,
     Files: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "File"
+        ref: "CloudFile"
     }]
 });
 

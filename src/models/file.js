@@ -16,4 +16,4 @@ const fileSchema = new mongoose.Schema({
 });
 
 const File = mongoose.model("CloudFile", fileSchema);
-exports.File = File;
+exports.File = {File};

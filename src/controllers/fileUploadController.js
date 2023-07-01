@@ -39,7 +39,6 @@ upload.fileHandler = async (req, res, next) => {
   
   const fileData = {
     filename: file.originalname,
-    owner: req.user ? req.user.id : null, // Check if req.user exists before accessing its id
     size: fileSizeInBytes,
     type: fileType,
     path: file.path,
@@ -52,10 +51,13 @@ upload.fileHandler = async (req, res, next) => {
   session.startTransaction();
   try {
     const savedFile = await File.create(fileData);
+    savedFile.owner.id = user;
+    await savedFile.save();
     console.log("File saved to MongoDB:", savedFile);
     if (user) {
       user.Files.push(savedFile);
       await user.save();
+      
       await session.commitTransaction();
     }
 
