@@ -52,7 +52,7 @@ app.get("/files", isAuthenticated, (req, res) => {
     getfiles.getFiles(req.user.id)
         .then(files => {
             res.render("home", { files: files });
-            console.log(files);
+            // console.log(files);
         })
         .catch(err => {
             console.log(err);
@@ -61,15 +61,38 @@ app.get("/files", isAuthenticated, (req, res) => {
 
 });
 
-// app.get("/secrets", (req, res) =>{
-//     User.find({"secret": {$ne: null}}).then(function(foundUsers){
-//       if(foundUsers){
-//         res.render("secrets", {secret: foundUsers});
-//       }
-//     }).catch(err =>{
-//       console.log(err);
-//     });
-//   });
+app.post("/files/rename/:id", (req, res) => {
+    const id = req.params.id;
+    const newName = req.body.newName;
+    getfiles.renameFile(id, newName)
+        .then(file => {
+            res.redirect("/files");
+        }
+        )
+        .catch(err => {
+            console.log(err);
+            res.status(500).send("Internal Server Error");
+        }
+        );
+});
+
+app.delete("/files/delete/:id", (req, res) => {
+    const id = req.params.id;
+    getfiles
+    .deleteFile(req.user.id, id)
+    .then(success => {
+      if (success) {
+        res.sendStatus(200); // Send a 200 status code for a successful deletion
+      } else {
+        res.sendStatus(404); // Send a 404 status code if the file is not found or already deleted
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.sendStatus(500); // Send a 500 status code for internal server errors
+    });
+});
+
 
 // app.get("/profile", async (req, res) => {
 //     if (req.isAuthenticated()) {
