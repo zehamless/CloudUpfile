@@ -6,6 +6,11 @@
   
   <div class="container">
   <div class="row">
+    <% files.forEach(element => { %>
+      <div class="col">
+        <a href=""><%= element.id %></a>
+      </div>
+      <% }); %>
 
     </div>
   </div>

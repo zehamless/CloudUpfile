@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 mongoose.connect("mongodb://localhost/CloudFile", { useNewUrlParser: true });
 const fileSchema = new mongoose.Schema({
-    name: String,
+    filename: String,
     path: String,
     size: Number,
     type: String,
@@ -16,4 +16,4 @@ const fileSchema = new mongoose.Schema({
 });
 
 const File = mongoose.model("CloudFile", fileSchema);
-exports.File = {File};
+module.exports = { File };

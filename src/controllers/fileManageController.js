@@ -11,7 +11,7 @@ async function getFiles(username) {
         throw new Error('User not found');
       }
       const files = user.Files;
-      console.log('Files:', files);
+      // console.log('Files:', files);
       return files;
   } catch (err) {
     console.error(err);
