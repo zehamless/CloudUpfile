@@ -8,91 +8,102 @@ const getfiles = require("./src/controllers/fileManageController");
 
 app.set("view engine", "ejs");
 app.use(
-    session({
-        secret: "secret",
-        resave: false,
-        saveUninitialized: false,
-    })
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
 const isAuthenticated = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
 };
 
 //AUTHENTICATION
 app.get(
-    "/auth/google",
-    passport.authenticate("google", { scope: ["profile"] })
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile"] })
 );
 
 app.get("/login", (req, res) => {
-    res.render("login");
+  res.render("login");
 });
-app.get('/home', (req, res) => {
-    res.render("home");
+app.get("/home", (req, res) => {
+  res.render("home");
 });
 app.get(
-    "/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/login" }),
-    function (req, res) {
-        // Successful authentication, redirect home.
-        res.redirect("/files");
-    }
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect("/files");
+  }
 );
-app.post("/upload", isAuthenticated, upload.single("fileUpload"), upload.fileHandler, (req, res) => {
+app.post(
+  "/upload",
+  isAuthenticated,
+  upload.single("fileUpload"),
+  upload.fileHandler,
+  (req, res) => {
     res.send("File uploaded successfully");
-});
+  }
+);
 
 app.get("/files", isAuthenticated, (req, res) => {
-    getfiles.getFiles(req.user.id)
-        .then(files => {
-            res.render("home", { files: files });
-            // console.log(files);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-        });
-
+  getfiles
+    .getFiles(req.user.id)
+    .then((files) => {
+      res.render("home", { files: files });
+      // console.log(files);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Internal Server Error");
+    });
 });
+app.get("/files/download/:id", isAuthenticated, async (req, res) => {
+  try {
+    const filePath = await getfiles.getPath(req.user.id, req.params.id);
 
-app.post("/files/rename/:id", (req, res) => {
-    const id = req.params.id;
-    const newName = req.body.newName;
-    getfiles.renameFile(id, newName)
-        .then(file => {
-            res.redirect("/files");
-        }
-        )
-        .catch(err => {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-        }
-        );
+    if (!filePath) {
+      res.status(404).send("File not found");
+      return;
+    }
+
+    // Sending the file as a download using res.download()
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error("Terjadi kesalahan saat mengunduh file:", err);
+        res.status(500).send("Terjadi kesalahan saat mengunduh file.");
+      }
+    });
+  } catch (error) {
+    console.error("Error while getting file path:", error);
+    res.status(500).send("Terjadi kesalahan saat mengunduh file.");
+  }
 });
 
 app.delete("/files/delete/:id", (req, res) => {
-    const id = req.params.id;
-    getfiles
+  const id = req.params.id;
+  getfiles
     .deleteFile(req.user.id, id)
-    .then(success => {
+    .then((success) => {
       if (success) {
         res.sendStatus(200); // Send a 200 status code for a successful deletion
       } else {
         res.sendStatus(404); // Send a 404 status code if the file is not found or already deleted
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.sendStatus(500); // Send a 500 status code for internal server errors
     });
 });
-
 
 // app.get("/profile", async (req, res) => {
 //     if (req.isAuthenticated()) {
@@ -110,7 +121,6 @@ app.delete("/files/delete/:id", (req, res) => {
 //     }
 // });
 
-
 app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
+  console.log(`Server started on port ${port}`);
 });

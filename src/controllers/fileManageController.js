@@ -21,17 +21,16 @@ async function getFiles(username) {
   }
 }
 
-async function renameFile(id, newName) {
+async function getPath(userId, id) {
   try {
     const file = await File.findById(id);
-    if (!file) {
-      throw new Error('File not found');
+    if (!file || typeof file.filename !== 'string') {
+      throw new Error('Invalid file');
     }
-
-    file.filename = newName;
-    return await file.save();
-  } catch (err) {
-    console.error(err);
+    const filePath = path.join('uploads', userId, file.filename);
+    return filePath;
+  } catch (error) {
+    console.error('Error while getting file path:', error);
     return null;
   }
 }
@@ -68,4 +67,4 @@ async function deleteFile(userId, id) {
 
     
 
-module.exports = { getFiles, renameFile, deleteFile };
+module.exports = { getFiles, deleteFile, getPath };
